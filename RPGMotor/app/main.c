@@ -1,19 +1,32 @@
 //#region Encabezados
 #include <stdio.h>
+#include <string.h>
 //#endregion
 
-//#region Enlazados
-    int game_loop(void);
+//#region Prototipos
+int game_loop(void);
 //#endregion
 
-// #region Función principal
+//#region Función principal
 int main(int argc, char* argv[])
 {
-    printf("Compilación correcta\n");
-    if(argc > 1 && argv[1] != NULL)
+    // Soporte para --version
+    if (argc > 1 && argv[1] != NULL)
     {
-        printf("Argumento pasado: %s\n",argv[1]);
+        if (strcmp(argv[1], "--version") == 0)
+        {
+            printf("RPG Engine v0.1 - Build OK\n");
+            return 0;
+        }
+        else
+        {
+            printf("Argumento pasado: %s\n", argv[1]);
+        }
     }
+
+    printf("Compilación correcta\n");
+
+    // Ejecutar el bucle principal del motor
     return game_loop();
 }
 //#endregion
