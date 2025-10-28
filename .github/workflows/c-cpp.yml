@@ -1,4 +1,4 @@
-name: C/C++ Multiplatform Build
+  name: C/C++ Multiplatform Build
 
 on:
   push:
@@ -26,7 +26,6 @@ jobs:
           name: rpg-linux
           path: RPGMotor/app/rpg
 
-
   # 🪟 Windows build
   build-windows:
     runs-on: windows-latest
@@ -45,8 +44,14 @@ jobs:
         working-directory: RPGMotor/app
         run: gcc -std=c99 -Wall -O2 main.c game_loop.c -o rpg.exe -lmingw32 -lSDL2main -lSDL2
 
-    # 🍏 macOS build
-build-macos:
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpg-windows
+          path: RPGMotor/app/rpg.exe
+
+  # 🍏 macOS build
+  build-macos:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -60,8 +65,8 @@ build-macos:
           SDL2_PATH=$(brew --prefix sdl2)
           echo "Using SDL2 path: $SDL2_PATH"
           gcc -std=c99 -Wall -O2 main.c game_loop.c -o rpg \
-            -I$SDL2_PATH/include \
-            -L$SDL2_PATH/lib -lSDL2
+              -I$SDL2_PATH/include \
+              -L$SDL2_PATH/lib -lSDL2
 
       - name: Verify binary
         working-directory: RPGMotor/app
@@ -69,6 +74,6 @@ build-macos:
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
-      with:
-        name: rpg-macos
-        path: RPGMotor/app/rpg
+        with:
+          name: rpg-macos
+          path: RPGMotor/app/rpg
