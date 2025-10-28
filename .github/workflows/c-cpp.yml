@@ -52,28 +52,6 @@ jobs:
           path: RPGMotor/app/rpg.exe
 
 
-  # 🍏 macOS build (FIXED)
-  build-macos:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install SDL2 via Homebrew
-        run: brew install sdl2
-
-      - name: Compile RPG Engine
-        working-directory: RPGMotor/app
-        run: |
-          SDL2_PATH=$(brew --prefix sdl2)
-          echo "Using SDL2 path: $SDL2_PATH"
-          gcc -std=c99 -Wall -O2 main.c game_loop.c -o rpg \
-              -I$SDL2_PATH/include/SDL2 \
-              -L$SDL2_PATH/lib -lSDL2
-
-      - name: Verify binary
-        working-directory: RPGMotor/app
-        run: file rpg
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
