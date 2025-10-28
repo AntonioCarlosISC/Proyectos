@@ -53,6 +53,7 @@ jobs:
           path: RPGMotor/app/rpg.exe
 
 
+  # 🍏 macOS build
   build-macos:
     runs-on: macos-latest
     steps:
@@ -61,9 +62,11 @@ jobs:
       - name: Install SDL2 via Homebrew
         run: brew install sdl2
 
-      - name: Locate SDL2 framework
-        id: sdl2
-        run: echo "SDL2_FRAMEWORK_PATH=$(brew --prefix sdl2)/Frameworks/SDL2.framework" >> $GITHUB_ENV
+      - name: Fix SDL2 include path for macOS
+        run: |
+          SDL2_PATH=$(brew --prefix sdl2)
+          sudo mkdir -p /usr/local/include/SDL2
+          sudo ln -sf "$SDL2_PATH/SDL2.framework/Headers/"/* /usr/local/include/SDL2/
 
       - name: Compile RPG Engine (using SDL2.framework)
         working-directory: RPGMotor/app
