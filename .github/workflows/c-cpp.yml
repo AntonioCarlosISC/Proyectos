@@ -64,7 +64,11 @@ jobs:
 
       - name: Compile RPG Engine
         working-directory: RPGMotor/app
-        run: gcc -std=c99 -Wall -O2 main.c game_loop.c -o rpg -F/opt/homebrew/opt/sdl2/Frameworks -framework SDL2
+        run: |
+          SDL2_PATH=$(brew --prefix sdl2)
+          gcc -std=c99 -Wall -O2 main.c game_loop.c -o rpg \
+              -I$SDL2_PATH/include/SDL2 \
+              -L$SDL2_PATH/lib -lSDL2
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
