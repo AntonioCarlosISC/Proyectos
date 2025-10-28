@@ -53,8 +53,7 @@ jobs:
           path: RPGMotor/app/rpg.exe
 
 
-  # 🍏 macOS build
-  build-macos:
+   build-macos:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -62,18 +61,19 @@ jobs:
       - name: Install SDL2 via Homebrew
         run: brew install sdl2
 
-      - name: Compile RPG Engine (macOS Framework)
+      - name: Locate SDL2 framework
+        id: sdl2
+        run: echo "SDL2_FRAMEWORK_PATH=$(brew --prefix sdl2)/Frameworks/SDL2.framework" >> $GITHUB_ENV
+
+      - name: Compile RPG Engine (using SDL2.framework)
         working-directory: RPGMotor/app
         run: |
-          SDL2_PATH=$(brew --prefix sdl2)
           gcc -std=c99 -Wall -O2 main.c game_loop.c -o rpg \
-              -F$SDL2_PATH/Frameworks -framework SDL2
+              -F$(brew --prefix sdl2)/Frameworks -framework SDL2
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: rpg-macos
-          path: RPGMotor/app/rpg
+      - name: Verify binary
+        working-directory: RPGMotor/app
+        run: file rpg
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
