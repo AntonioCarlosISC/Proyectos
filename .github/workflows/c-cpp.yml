@@ -50,4 +50,3 @@ jobs:
         with:
           name: rpg-windows
           path: RPGMotor/app/rpg.exe
-          path: RPGMotor/app/rpg
