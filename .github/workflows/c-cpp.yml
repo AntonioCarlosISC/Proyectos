@@ -8,31 +8,31 @@ on:
 
 jobs:
   build-linux:
-    name: Build on Linux
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Install SDL2
         run: sudo apt-get update && sudo apt-get install -y libsdl2-dev
       - name: Compile RPG Engine
+        working-directory: app
         run: gcc -std=c99 -Wall -O2 main.c game_loop.c -o rpg -lSDL2
       - name: Run RPG Engine --version
+        working-directory: app
         run: ./rpg --version
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: rpg-linux
-          path: rpg
+          path: app/rpg
 
+jobs:
   build-windows:
-    name: Build on Windows
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - name: Install MSYS2 (for SDL2)
         shell: pwsh
-        run: |
-          choco install msys2 --yes
+        run: choco install msys2 --yes
       - name: Update MSYS2 and install SDL2
         shell: bash
         run: |
@@ -40,10 +40,10 @@ jobs:
           pacman -S --noconfirm mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2
       - name: Compile RPG Engine
         shell: bash
-        run: |
-          gcc -std=c99 -Wall -O2 main.c game_loop.c -o rpg.exe -lmingw32 -lSDL2main -lSDL2
+        working-directory: app
+        run: gcc -std=c99 -Wall -O2 main.c game_loop.c -o rpg.exe -lmingw32 -lSDL2main -lSDL2
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: rpg-windows
-          path: rpg.exe
+          path: app/rpg.exe
