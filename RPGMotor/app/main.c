@@ -1,7 +1,19 @@
-//Encabezados
+//#region Encabezados
+#include <stdio.h>
+//#endregion
 
-//Encabezados
+//#region Enlazados
+    int game_loop(void);
+//#endregion
 
-//Función principal
-
-//Función principal
+// #region Función principal
+int main(int argc, char* argv[])
+{
+    printf("Compilación correcta\n");
+    if(argc > 1 && argv[1] != NULL)
+    {
+        printf("Argumento pasado: %s\n",argv[1]);
+    }
+    return game_loop();
+}
+//#endregion
