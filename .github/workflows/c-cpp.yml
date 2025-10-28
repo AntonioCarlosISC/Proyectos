@@ -33,7 +33,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Instalar MSYS2 y dependencias SDL2
       - uses: msys2/setup-msys2@v2
         with:
           update: true
@@ -53,7 +52,7 @@ jobs:
           path: RPGMotor/app/rpg.exe
 
 
-  # 🍏 macOS build
+  # 🍏 macOS build (FIXED)
   build-macos:
     runs-on: macos-latest
     steps:
@@ -62,17 +61,14 @@ jobs:
       - name: Install SDL2 via Homebrew
         run: brew install sdl2
 
-      - name: Fix SDL2 include path for macOS
-        run: |
-          SDL2_PATH=$(brew --prefix sdl2)
-          sudo mkdir -p /usr/local/include/SDL2
-          sudo ln -sf "$SDL2_PATH/SDL2.framework/Headers/"/* /usr/local/include/SDL2/
-
-      - name: Compile RPG Engine (using SDL2.framework)
+      - name: Compile RPG Engine
         working-directory: RPGMotor/app
         run: |
+          SDL2_PATH=$(brew --prefix sdl2)
+          echo "Using SDL2 path: $SDL2_PATH"
           gcc -std=c99 -Wall -O2 main.c game_loop.c -o rpg \
-              -F$(brew --prefix sdl2)/Frameworks -framework SDL2
+              -I$SDL2_PATH/include/SDL2 \
+              -L$SDL2_PATH/lib -lSDL2
 
       - name: Verify binary
         working-directory: RPGMotor/app
