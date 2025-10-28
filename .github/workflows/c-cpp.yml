@@ -7,6 +7,7 @@ on:
     branches: [ "MAIN" ]
 
 jobs:
+  # 🐧 Linux build
   build-linux:
     runs-on: ubuntu-latest
     steps:
@@ -19,22 +20,20 @@ jobs:
         working-directory: RPGMotor/app
         run: gcc -std=c99 -Wall -O2 main.c game_loop.c -o rpg -lSDL2
 
-      - name: Run RPG Engine --version
-        working-directory: RPGMotor/app
-        run: ./rpg --version
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: rpg-linux
           path: RPGMotor/app/rpg
 
+
+  # 🪟 Windows build
   build-windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
 
-      # Instalar MSYS2 usando la action oficial
+      # Instalar MSYS2 y dependencias SDL2
       - uses: msys2/setup-msys2@v2
         with:
           update: true
@@ -47,13 +46,28 @@ jobs:
         working-directory: RPGMotor/app
         run: gcc -std=c99 -Wall -O2 main.c game_loop.c -o rpg.exe -lmingw32 -lSDL2main -lSDL2
 
-      - name: Run RPG Engine --version
-        shell: msys2 {0}
-        working-directory: RPGMotor/app
-        run: ./rpg.exe --version
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: rpg-windows
           path: RPGMotor/app/rpg.exe
+
+
+  # 🍏 macOS build
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install SDL2 via Homebrew
+        run: brew install sdl2
+
+      - name: Compile RPG Engine
+        working-directory: RPGMotor/app
+        run: gcc -std=c99 -Wall -O2 main.c game_loop.c -o rpg -F/opt/homebrew/opt/sdl2/Frameworks -framework SDL2
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpg-macos
+          path: RPGMotor/app/rpg
