@@ -62,13 +62,18 @@ jobs:
       - name: Install SDL2 via Homebrew
         run: brew install sdl2
 
-      - name: Compile RPG Engine
+      - name: Compile RPG Engine (macOS Framework)
         working-directory: RPGMotor/app
         run: |
           SDL2_PATH=$(brew --prefix sdl2)
           gcc -std=c99 -Wall -O2 main.c game_loop.c -o rpg \
-              -I$SDL2_PATH/include/SDL2 \
-              -L$SDL2_PATH/lib -lSDL2
+              -F$SDL2_PATH/Frameworks -framework SDL2
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpg-macos
+          path: RPGMotor/app/rpg
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
