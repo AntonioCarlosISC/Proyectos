@@ -25,7 +25,6 @@ jobs:
           name: rpg-linux
           path: app/rpg
 
-jobs:
   build-windows:
     runs-on: windows-latest
     steps:
