@@ -1,12 +1,23 @@
-//#region Encabezados
-#include <SDL2/SDL_stdinc.h>
-#include <SDL2/SDL_video.h>
+//#region Encabezados portables
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
-#include <SDL2/SDL.h>
 #include <pthread.h>
+
+#if defined(_WIN32) || defined(_WIN64)
+    // Windows
+    #include <SDL2/SDL.h>
+#elif defined(__APPLE__) && defined(__MACH__)
+    // macOS
+    #include <SDL2/SDL.h>   // Asumiendo que usarás el framework de SDL2 o include path de Homebrew
+#else
+    // Linux / otros UNIX
+    #include <SDL2/SDL_stdinc.h>
+    #include <SDL2/SDL_video.h>
+    #include <SDL2/SDL.h>
+#endif
 //#endregion
+
 
 //#region Prototipos
 int game_loop(void);
