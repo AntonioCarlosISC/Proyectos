@@ -14,16 +14,16 @@ jobs:
       - name: Install SDL2
         run: sudo apt-get update && sudo apt-get install -y libsdl2-dev
       - name: Compile RPG Engine
-        working-directory: app
+        working-directory: RPGMotor/app
         run: gcc -std=c99 -Wall -O2 main.c game_loop.c -o rpg -lSDL2
       - name: Run RPG Engine --version
-        working-directory: app
+        working-directory: RPGMotor/app
         run: ./rpg --version
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: rpg-linux
-          path: app/rpg
+          path: RPGMotor/app/rpg
 
   build-windows:
     runs-on: windows-latest
@@ -39,10 +39,10 @@ jobs:
           pacman -S --noconfirm mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2
       - name: Compile RPG Engine
         shell: bash
-        working-directory: app
+        working-directory: RPGMotor/app
         run: gcc -std=c99 -Wall -O2 main.c game_loop.c -o rpg.exe -lmingw32 -lSDL2main -lSDL2
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: rpg-windows
-          path: app/rpg.exe
+          path: RPGMotor/app/rpg.exe
