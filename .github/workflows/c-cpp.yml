@@ -53,7 +53,7 @@ jobs:
           path: RPGMotor/app/rpg.exe
 
 
-   build-macos:
+  build-macos:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
