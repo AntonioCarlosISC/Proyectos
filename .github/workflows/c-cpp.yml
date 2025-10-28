@@ -50,10 +50,4 @@ jobs:
         with:
           name: rpg-windows
           path: RPGMotor/app/rpg.exe
-
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: rpg-macos
           path: RPGMotor/app/rpg
