@@ -17,8 +17,17 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libsdl2-dev
 
       - name: Compile RPG Engine
-        working-directory: RPGMotor/app
-        run: gcc -std=c99 -Wall -O2 main.c game_loop.c -o rpg -lSDL2
+        working-directory: RPGMotor
+        run: |
+          gcc -std=c99 -Wall -O2 \
+            app/main.c app/game_loop.c \
+            engine/core.c \
+            engine/input/input.c \
+            engine/graphics/graphics.c \
+            engine/graphics/draw.c \
+            -Iengine -Iengine/input -Iengine/graphics \
+            -lSDL2 -pthread \
+            -o app/rpg
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -41,8 +50,17 @@ jobs:
 
       - name: Compile RPG Engine
         shell: msys2 {0}
-        working-directory: RPGMotor/app
-        run: gcc -std=c99 -Wall -O2 main.c game_loop.c -o rpg.exe -lmingw32 -lSDL2main -lSDL2
+        working-directory: RPGMotor
+        run: |
+          gcc -std=c99 -Wall -O2 \
+            app/main.c app/game_loop.c \
+            engine/core.c \
+            engine/input/input.c \
+            engine/graphics/graphics.c \
+            engine/graphics/draw.c \
+            -Iengine -Iengine/input -Iengine/graphics \
+            -lmingw32 -lSDL2main -lSDL2 \
+            -o app/rpg.exe
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
