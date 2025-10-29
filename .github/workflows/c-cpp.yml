@@ -20,14 +20,14 @@ jobs:
         working-directory: RPGMotor/
         run: |
           gcc -std=c99 -Wall -O2 \
-          ./app/main.c ./app/game_loop.c \
+          main.c game_loop.c \
           ./engine/core.c \
           ./engine/input/input.c \
           ./engine/graphics/graphics.c \
           ./engine/graphics/draw.c \
           -I./engine -I./engine/input -I./engine/graphics \
-          -lmingw32 -lSDL2main -lSDL2 \
-          -o ./app/rpg
+          -lSDL2 -pthread \
+          -o rpg
 
 
       - name: Upload artifact
