@@ -1,5 +1,7 @@
 #include "draw.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_timer.h>
+#include "../../test/test.h"
 
 void draw_init(FrameTimer* timer)
 {
@@ -25,8 +27,17 @@ void draw_frame(GraphicsContext* ctx, FrameTimer* timer)
     SDL_RenderClear(ctx->renderer);
 
     // Aquí puedes dibujar tus entidades, UI, sprites, etc.
+    //Prueba de colores al inicializar, así como resolución
+    // 🔹 Test de colores
+    static int initialized = 0;
+    static TEST test;
+    if(!initialized) {
+        test_rgb(&test, ctx->renderer);
+        SDL_Delay(3000);
+        initialized = 1;
+    }
     // Por ahora, un ejemplo visual simple:
-    SDL_SetRenderDrawColor(ctx->renderer, 255, 0, 0, 255);
+    SDL_SetRenderDrawColor(ctx->renderer, 255, 255, 0, 255);
     SDL_Rect rect = { 200, 200, 100, 100 };
     SDL_RenderFillRect(ctx->renderer, &rect);
 

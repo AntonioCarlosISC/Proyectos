@@ -6,28 +6,40 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 
+// Estructura para pasar al hilo de entrada
+typedef struct {
+    GraphicsContext* ctx;
+    FrameTimer* timer;
+} InputArgs;
+
 int game_loop(char* display) {
+    // Inicializar gráficos
     GraphicsContext* ctx = graphics_init(display);
     if (!ctx) return 1;
 
+    // Inicializar temporizador de frames
     FrameTimer timer;
     draw_init(&timer);
 
+    // Preparar argumentos para el hilo de entrada
+    InputArgs args = { ctx, &timer };
     pthread_t tid;
-    pthread_create(&tid, NULL, input_thread, NULL);
+    pthread_create(&tid, NULL, input_thread, &args);
 
     SDL_Event event;
 
     while (running) {
+        // Procesar eventos SDL
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT)
                 running = false;
         }
 
-        // 🔧 Procesar comando pendiente
+        // Procesar comando pendiente
         switch (pending_command.type) {
             case CMD_EXIT:
                 running = false;
+                printf("Bye ;v\n");
                 break;
             case CMD_FULLSCREEN:
                 graphics_set_fullscreen(ctx, true);
@@ -55,13 +67,15 @@ int game_loop(char* display) {
         // Resetear comando
         pending_command.type = CMD_NONE;
 
-        // ✅ Renderizado correcto
+        // Renderizado y sincronización
         draw_update_timer(&timer);
         draw_frame(ctx, &timer);
         draw_sync(&timer, 60.0);
     }
 
+    // Limpieza al salir del bucle
     pthread_join(tid, NULL);
     graphics_shutdown(ctx);
+
     return 0;
 }
