@@ -17,7 +17,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libsdl2-dev
 
       - name: Compile RPG Engine
-        working-directory: RPGMotor
+        working-directory: RPGMotor/
         run: |
           gcc -std=c99 -Wall -O2 \
           ./app/main.c ./app/game_loop.c \
@@ -51,7 +51,7 @@ jobs:
 
       - name: Compile RPG Engine
         shell: msys2 {0}
-        working-directory: RPGMotor
+        working-directory: RPGMotor/
         run: |
           gcc -std=c99 -Wall -O2 \
           ./app/main.c ./app/game_loop.c \
@@ -62,6 +62,7 @@ jobs:
           -I./engine -I./engine/input -I./engine/graphics \
           -lmingw32 -lSDL2main -lSDL2 \
           -o ./app/rpg.exe
+
 
 
       - name: Upload artifact
