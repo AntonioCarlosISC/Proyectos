@@ -4,7 +4,7 @@
 //#endregion
 
 //#region Prototipos
-int game_loop(void);
+int game_loop(char*);
 //#endregion
 
 //#region Función principal
@@ -18,6 +18,10 @@ int main(int argc, char* argv[])
             printf("RPG Engine v0.1 - Build OK\n");
             return 0;
         }
+        else if (strcmp(argv[1], "--full") == 0)
+        {
+            return game_loop("full");
+        }
         else
         {
             printf("Argumento pasado: %s\n", argv[1]);
@@ -26,7 +30,7 @@ int main(int argc, char* argv[])
 
     printf("Compilación correcta\n");
 
-    // Ejecutar el bucle principal del motor
-    return game_loop();
+    // Ejecutar el bucle principal del motor en modo ventana por defecto
+    return game_loop("window");
 }
 //#endregion
