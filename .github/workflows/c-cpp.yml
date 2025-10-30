@@ -41,6 +41,7 @@ jobs:
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-SDL2
             mingw-w64-x86_64-SDL2_ttf
+            mingw-w64-x86_64-make
 
       - name: Compile RPG Engine with Make
         shell: msys2 {0}
