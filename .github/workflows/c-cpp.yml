@@ -13,8 +13,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install SDL2
-        run: sudo apt-get update && sudo apt-get install -y libsdl2-dev
+      - name: Install SDL2 and SDL2_ttf
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsdl2-dev libsdl2-ttf-dev
 
       - name: Compile RPG Engine
         working-directory: RPGMotor/
@@ -25,11 +27,11 @@ jobs:
           engine/input/input.c \
           engine/graphics/graphics.c \
           engine/graphics/draw.c \
-          -Iengine -Iengine/input -Iengine/graphics \
-          -lSDL2 -pthread \
+          engine/fonts/fonts.c \
+          test/test.c \
+          -Iengine -Iengine/input -Iengine/graphics -Iengine/fonts -Itest \
+          -lSDL2 -lSDL2_ttf -pthread \
           -o app/rpg
-
-
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -49,6 +51,7 @@ jobs:
           install: >
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-SDL2
+            mingw-w64-x86_64-SDL2_ttf
 
       - name: Compile RPG Engine
         shell: msys2 {0}
@@ -60,11 +63,11 @@ jobs:
           ./engine/input/input.c \
           ./engine/graphics/graphics.c \
           ./engine/graphics/draw.c \
-          -I./engine -I./engine/input -I./engine/graphics \
-          -lmingw32 -lSDL2main -lSDL2 \
+          ./engine/fonts/fonts.c \
+          ./test/test.c \
+          -I./engine -I./engine/input -I./engine/graphics -I./engine/fonts -I./test \
+          -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf \
           -o ./app/rpg.exe
-
-
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
