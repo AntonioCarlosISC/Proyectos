@@ -1,5 +1,5 @@
 # --------------------------
-# Makefile RPGMotor multiplataforma
+# Makefile RPGMotor multiplataforma (dinámico)
 # --------------------------
 
 # --------------------------
@@ -26,35 +26,27 @@ else
 endif
 
 # Carpetas fuente
-SRC_DIR_APP = app
-SRC_DIR_ENGINE = engine
-SRC_DIR_TEST = test
+SRC_DIRS = app engine test
 
 # Carpeta de objetos y build
 OBJ_DIR = obj
 BUILD_DIR = build
 BUILD_ASSETS = $(BUILD_DIR)/engine/fonts/static
 
-# --------------------------
-# Archivos fuente y objetos
-# --------------------------
-SRC = $(wildcard $(SRC_DIR_APP)/*.c) \
-      $(wildcard $(SRC_DIR_ENGINE)/*.c) \
-      $(wildcard $(SRC_DIR_ENGINE)/input/*.c) \
-      $(wildcard $(SRC_DIR_ENGINE)/graphics/*.c) \
-      $(wildcard $(SRC_DIR_ENGINE)/fonts/*.c) \
-      $(wildcard $(SRC_DIR_TEST)/*.c)
-
-OBJ = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRC))
-DEP = $(OBJ:.o=.d)
-
 # Includes
 INCLUDES = -Iengine -Iengine/input -Iengine/graphics -Iengine/fonts/fonts -Itest/test
 
 # --------------------------
+# Encontrar todos los .c automáticamente
+# --------------------------
+SRC = $(shell find $(SRC_DIRS) -name "*.c")
+OBJ = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRC))
+DEP = $(OBJ:.o=.d)
+
+# --------------------------
 # Targets principales
 # --------------------------
-.PHONY: all clean dirs assets
+.PHONY: all clean dirs assets linux windows
 
 all: dirs assets $(TARGET)
 
@@ -65,13 +57,15 @@ $(TARGET): $(OBJ)
 	$(CC) $(OBJ) -o $@ $(SDLFLAGS) $(THREADFLAGS)
 
 # --------------------------
-# Compilación de objetos
+# Compilación de objetos (manteniendo estructura de carpetas)
 # --------------------------
 $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
+# --------------------------
 # Incluir dependencias de headers
+# --------------------------
 -include $(DEP)
 
 # --------------------------
@@ -92,4 +86,11 @@ assets:
 # Limpiar compilados
 # --------------------------
 clean:
+	@echo "[INFO] Limpiando build y objetos..."
 	@rm -rf $(OBJ_DIR) $(BUILD_DIR)
+
+# --------------------------
+# Linux/Windows targets explícitos
+# --------------------------
+linux: all
+windows: all
