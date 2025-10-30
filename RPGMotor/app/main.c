@@ -1,6 +1,7 @@
 //#region Encabezados
 #include <stdio.h>
 #include <string.h>
+#include "../engine/core.h"
 //#endregion
 
 //#region Prototipos
@@ -10,6 +11,7 @@ int game_loop(char*);
 //#region Función principal
 int main(int argc, char* argv[])
 {
+    core_init();
     // Soporte para --version
     if (argc > 1 && argv[1] != NULL)
     {

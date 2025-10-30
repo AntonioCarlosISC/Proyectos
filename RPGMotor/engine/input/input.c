@@ -5,13 +5,15 @@
 #include <stdbool.h>
 
 void* input_thread(void* arg) {
-    (void)arg; // no usamos directamente el contexto gráfico
+    (void)arg; // No usamos directamente el contexto gráfico
     char command[64];
 
     printf("[INFO] Hilo de entrada iniciado correctamente.\n");
 
     while (running) {
         printf("> ");
+        fflush(stdout);
+
         if (fgets(command, sizeof(command), stdin)) {
             command[strcspn(command, "\n")] = 0;
 
@@ -29,9 +31,14 @@ void* input_thread(void* arg) {
                     pending_command.type = CMD_RESIZE;
                     pending_command.w = w;
                     pending_command.h = h;
+                } else {
+                    printf("[WARN] Formato incorrecto. Uso: resize WIDTH HEIGHT\n");
                 }
+            } else if (strcmp(command, "show_fps") == 0) {
+                // Alternar la visualización de FPS
+                pending_command.type = CMD_SHOW_FPS;
             } else if (strcmp(command, "clear") == 0) {
-                system("clear"); // Linux/macOS
+                system("clear");
             } else if (strlen(command) > 0) {
                 printf("[WARN] Comando no reconocido: %s\n", command);
             }

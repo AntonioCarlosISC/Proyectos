@@ -1,10 +1,18 @@
 #include "graphics.h"
 #include <stdio.h>
 #include <string.h>
+#include <SDL2/SDL_ttf.h>
+#include "../core.h"
 
 GraphicsContext* graphics_init(const char* display) {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
         fprintf(stderr, "[ERROR] SDL_Init failed: %s\n", SDL_GetError());
+        return NULL;
+    }
+
+    if (TTF_Init() != 0) {
+        fprintf(stderr, "[ERROR] TTF_Init failed: %s\n", TTF_GetError());
+        SDL_Quit();
         return NULL;
     }
 
@@ -27,6 +35,7 @@ GraphicsContext* graphics_init(const char* display) {
 
     if (!window) {
         fprintf(stderr, "[ERROR] SDL_CreateWindow failed: %s\n", SDL_GetError());
+        TTF_Quit();
         SDL_Quit();
         return NULL;
     }
@@ -37,6 +46,7 @@ GraphicsContext* graphics_init(const char* display) {
     if (!renderer) {
         fprintf(stderr, "[ERROR] SDL_CreateRenderer failed: %s\n", SDL_GetError());
         SDL_DestroyWindow(window);
+        TTF_Quit();
         SDL_Quit();
         return NULL;
     }
@@ -44,13 +54,27 @@ GraphicsContext* graphics_init(const char* display) {
     GraphicsContext* ctx = malloc(sizeof(GraphicsContext));
     ctx->window = window;
     ctx->renderer = renderer;
+
+    // Inicializar la fuente principal del motor
+const char* font_path = get_resource_path("fonts/static/OpenSans_Condensed-Bold.ttf");
+ctx->main_font = font_load(font_path, 16);
+if (!ctx->main_font) {
+    fprintf(stderr, "[ERROR] No se pudo cargar la fuente principal\n");
+    graphics_shutdown(ctx);
+    return NULL;
+} else {
+        printf("[INFO] Fuente cargada correctamente desde: %s\n", font_path);
+    }
+
     return ctx;
 }
 
 void graphics_shutdown(GraphicsContext* ctx) {
     if (!ctx) return;
+    if (ctx->main_font) font_free(ctx->main_font);
     SDL_DestroyRenderer(ctx->renderer);
     SDL_DestroyWindow(ctx->window);
+    TTF_Quit();
     SDL_Quit();
     free(ctx);
 }

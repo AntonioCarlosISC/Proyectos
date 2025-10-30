@@ -1,5 +1,8 @@
 #include "draw.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_timer.h>
+#include "../../test/test.h"
+#include <SDL2/SDL_ttf.h>
 
 void draw_init(FrameTimer* timer)
 {
@@ -24,18 +27,40 @@ void draw_frame(GraphicsContext* ctx, FrameTimer* timer)
     SDL_SetRenderDrawColor(ctx->renderer, 0, 0, 0, 255);
     SDL_RenderClear(ctx->renderer);
 
-    // Aquí puedes dibujar tus entidades, UI, sprites, etc.
-    // Por ahora, un ejemplo visual simple:
-    SDL_SetRenderDrawColor(ctx->renderer, 255, 0, 0, 255);
+    // 🔹 Test de colores inicial
+    static int initialized = 0;
+    static TEST test;
+    if (!initialized) {
+        test_rgb(&test, ctx->renderer);
+        SDL_Delay(3000);
+        initialized = 1;
+    }
+
+    // Cuadro amarillo de ejemplo
+    SDL_SetRenderDrawColor(ctx->renderer, 255, 255, 0, 255);
     SDL_Rect rect = { 200, 200, 100, 100 };
     SDL_RenderFillRect(ctx->renderer, &rect);
 
-    SDL_RenderPresent(ctx->renderer);
+    // 🔹 Mostrar FPS en pantalla
+if (ctx->show_fps) {
+    char buf[32];
+    snprintf(buf, sizeof(buf), "FPS: %.1f", timer->fps);
+    SDL_Color color = {255, 255, 255, 255};
+    SDL_Texture* tex = font_render_text(ctx->renderer, ctx->main_font, buf, color);
+    if (tex) {
+        int w, h;
+        SDL_QueryTexture(tex, NULL, NULL, &w, &h);
+        SDL_Rect dst = {10, 10, w, h};
+        SDL_RenderCopy(ctx->renderer, tex, NULL, &dst);
+        SDL_DestroyTexture(tex);
+    }
+}
 
-    // Mostrar FPS en consola (opcional para debug)
-    //printf("\rFPS: %.1f", timer->fps);
+
+    SDL_RenderPresent(ctx->renderer);
     fflush(stdout);
 }
+
 
 void draw_sync(FrameTimer* timer, double target_fps)
 {
