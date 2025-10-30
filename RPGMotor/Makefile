@@ -1,48 +1,52 @@
 # --------------------------
-# Makefile definitivo RPGMotor
+# Makefile RPGMotor multiplataforma
 # --------------------------
 
 # --------------------------
 # Variables generales
 # --------------------------
 CC = gcc
-CFLAGS = -std=c99 -Wall -O2
+CFLAGS = -std=c99 -Wall -O2 -MMD -MP
 THREADFLAGS = -pthread
 
-# SDL2
-SDLFLAGS_LINUX = `sdl2-config --cflags --libs` -lSDL2_ttf
-SDLFLAGS_WINDOWS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf
+# Detectar sistema operativo
+UNAME_S := $(shell uname -s)
+
+ifeq ($(UNAME_S),Linux)
+	SDLFLAGS = `sdl2-config --cflags --libs` -lSDL2_ttf
+	TARGET = build/rpg
+else ifeq ($(OS),Windows_NT)
+	SDLFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf
+	TARGET = build/rpg.exe
+else ifeq ($(UNAME_S),Darwin)
+	SDLFLAGS = `sdl2-config --cflags --libs` -lSDL2_ttf
+	TARGET = build/rpg
+else
+	$(error Sistema operativo no soportado)
+endif
 
 # Carpetas fuente
 SRC_DIR_APP = app
 SRC_DIR_ENGINE = engine
 SRC_DIR_TEST = test
 
-# Carpetas objeto
+# Carpeta de objetos y build
 OBJ_DIR = obj
-OBJ_DIR_APP = $(OBJ_DIR)/app
-OBJ_DIR_ENGINE = $(OBJ_DIR)/engine
-OBJ_DIR_TEST = $(OBJ_DIR)/test
-
-# Carpeta de build final
 BUILD_DIR = build
 BUILD_ASSETS = $(BUILD_DIR)/engine/fonts/static
 
-# Archivos fuente
-SRC_APP = $(SRC_DIR_APP)/main.c $(SRC_DIR_APP)/game_loop.c
-SRC_ENGINE = $(SRC_DIR_ENGINE)/core.c $(SRC_DIR_ENGINE)/input/input.c $(SRC_DIR_ENGINE)/graphics/graphics.c $(SRC_DIR_ENGINE)/graphics/draw.c $(SRC_DIR_ENGINE)/fonts/fonts.c
-SRC_TEST = $(SRC_DIR_TEST)/test.c
-SRC = $(SRC_APP) $(SRC_ENGINE) $(SRC_TEST)
+# --------------------------
+# Archivos fuente y objetos
+# --------------------------
+SRC = $(wildcard $(SRC_DIR_APP)/*.c) \
+      $(wildcard $(SRC_DIR_ENGINE)/*.c) \
+      $(wildcard $(SRC_DIR_ENGINE)/input/*.c) \
+      $(wildcard $(SRC_DIR_ENGINE)/graphics/*.c) \
+      $(wildcard $(SRC_DIR_ENGINE)/fonts/*.c) \
+      $(wildcard $(SRC_DIR_TEST)/*.c)
 
-# Archivos objeto
-OBJ_APP = $(patsubst $(SRC_DIR_APP)/%.c, $(OBJ_DIR_APP)/%.o, $(SRC_APP))
-OBJ_ENGINE = $(patsubst $(SRC_DIR_ENGINE)/%.c, $(OBJ_DIR_ENGINE)/%.o, $(SRC_ENGINE))
-OBJ_TEST = $(patsubst $(SRC_DIR_TEST)/%.c, $(OBJ_DIR_TEST)/%.o, $(SRC_TEST))
-OBJ = $(OBJ_APP) $(OBJ_ENGINE) $(OBJ_TEST)
-
-# Ejecutables
-TARGET_LINUX = $(BUILD_DIR)/rpg
-TARGET_WINDOWS = $(BUILD_DIR)/rpg.exe
+OBJ = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRC))
+DEP = $(OBJ:.o=.d)
 
 # Includes
 INCLUDES = -Iengine -Iengine/input -Iengine/graphics -Iengine/fonts/fonts -Itest/test
@@ -50,32 +54,31 @@ INCLUDES = -Iengine -Iengine/input -Iengine/graphics -Iengine/fonts/fonts -Itest
 # --------------------------
 # Targets principales
 # --------------------------
-.PHONY: all clean linux windows dirs assets
+.PHONY: all clean dirs assets
 
-all: linux
-
-# --------------------------
-# Linux
-# --------------------------
-linux: dirs assets $(TARGET_LINUX)
-
-$(TARGET_LINUX): $(OBJ)
-	$(CC) $(OBJ) -o $@ $(SDLFLAGS_LINUX) $(THREADFLAGS)
+all: dirs assets $(TARGET)
 
 # --------------------------
-# Windows (MinGW)
+# Linking
 # --------------------------
-windows: dirs assets $(TARGET_WINDOWS)
+$(TARGET): $(OBJ)
+	$(CC) $(OBJ) -o $@ $(SDLFLAGS) $(THREADFLAGS)
 
-$(TARGET_WINDOWS): $(OBJ)
-	$(CC) $(OBJ) -o $@ $(SDLFLAGS_WINDOWS)
+# --------------------------
+# Compilación de objetos
+# --------------------------
+$(OBJ_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+# Incluir dependencias de headers
+-include $(DEP)
 
 # --------------------------
 # Crear carpetas necesarias
 # --------------------------
 dirs:
-	mkdir -p $(OBJ_DIR_APP) $(OBJ_DIR_ENGINE) $(OBJ_DIR_TEST)
-	mkdir -p $(BUILD_DIR) $(BUILD_ASSETS)
+	@mkdir -p $(OBJ_DIR) $(BUILD_DIR) $(BUILD_ASSETS)
 
 # --------------------------
 # Copiar assets al build
@@ -86,31 +89,7 @@ assets:
 	@cp -r engine/fonts/static/* $(BUILD_ASSETS)/
 
 # --------------------------
-# Compilación de objetos
-# --------------------------
-$(OBJ_DIR_APP)/%.o: $(SRC_DIR_APP)/%.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
-$(OBJ_DIR_ENGINE)/%.o: $(SRC_DIR_ENGINE)/%.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
-$(OBJ_DIR_ENGINE)/input/%.o: $(SRC_DIR_ENGINE)/input/%.c
-	mkdir -p $(OBJ_DIR_ENGINE)/input
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
-$(OBJ_DIR_ENGINE)/graphics/%.o: $(SRC_DIR_ENGINE)/graphics/%.c
-	mkdir -p $(OBJ_DIR_ENGINE)/graphics
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
-$(OBJ_DIR_ENGINE)/fonts/%.o: $(SRC_DIR_ENGINE)/fonts/%.c
-	mkdir -p $(OBJ_DIR_ENGINE)/fonts
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
-$(OBJ_DIR_TEST)/%.o: $(SRC_DIR_TEST)/%.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
-# --------------------------
 # Limpiar compilados
 # --------------------------
 clean:
-	rm -rf $(OBJ_DIR) $(BUILD_DIR)
+	@rm -rf $(OBJ_DIR) $(BUILD_DIR)
