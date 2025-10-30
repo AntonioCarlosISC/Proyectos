@@ -60,6 +60,10 @@ int game_loop(char* display) {
                 graphics_resize(ctx, pending_command.w, pending_command.h);
                 printf("[INFO] Resolución ajustada a %dx%d.\n", pending_command.w, pending_command.h);
                 break;
+            case CMD_SHOW_FPS:
+                ctx->show_fps = !ctx->show_fps;
+                printf("[INFO] Mostrar FPS: %s\n", ctx->show_fps ? "ON" : "OFF");
+                break;
             default:
                 break;
         }

@@ -11,17 +11,14 @@ void* input_thread(void* arg) {
     printf("[INFO] Hilo de entrada iniciado correctamente.\n");
 
     while (running) {
-        // Imprimir prompt y vaciar stdout inmediatamente
         printf("> ");
         fflush(stdout);
 
         if (fgets(command, sizeof(command), stdin)) {
-            // Eliminar salto de línea
             command[strcspn(command, "\n")] = 0;
 
-            // Procesar comando
             if (strcmp(command, "exit") == 0) {
-                pending_command.type = CMD_EXIT;                
+                pending_command.type = CMD_EXIT;
             } else if (strcmp(command, "full") == 0) {
                 pending_command.type = CMD_FULLSCREEN;
             } else if (strcmp(command, "window") == 0) {
@@ -37,8 +34,11 @@ void* input_thread(void* arg) {
                 } else {
                     printf("[WARN] Formato incorrecto. Uso: resize WIDTH HEIGHT\n");
                 }
+            } else if (strcmp(command, "show_fps") == 0) {
+                // Alternar la visualización de FPS
+                pending_command.type = CMD_SHOW_FPS;
             } else if (strcmp(command, "clear") == 0) {
-                system("clear"); // Linux/macOS
+                system("clear");
             } else if (strlen(command) > 0) {
                 printf("[WARN] Comando no reconocido: %s\n", command);
             }
