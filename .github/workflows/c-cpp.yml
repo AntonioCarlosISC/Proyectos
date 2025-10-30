@@ -18,26 +18,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libsdl2-dev libsdl2-ttf-dev
 
-      - name: Compile RPG Engine
+      - name: Compile RPG Engine with Make
         working-directory: RPGMotor/
-        run: |
-          gcc -std=c99 -Wall -O2 \
-          app/main.c app/game_loop.c \
-          engine/core.c \
-          engine/input/input.c \
-          engine/graphics/graphics.c \
-          engine/graphics/draw.c \
-          engine/fonts/fonts.c \
-          test/test.c \
-          -Iengine -Iengine/input -Iengine/graphics -Iengine/fonts -Itest \
-          -lSDL2 -lSDL2_ttf -pthread \
-          -o app/rpg
+        run: make
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: rpg-linux
-          path: RPGMotor/app/rpg
+          path: RPGMotor/build/rpg
 
   # 🪟 Windows build
   build-windows:
@@ -53,24 +42,13 @@ jobs:
             mingw-w64-x86_64-SDL2
             mingw-w64-x86_64-SDL2_ttf
 
-      - name: Compile RPG Engine
+      - name: Compile RPG Engine with Make
         shell: msys2 {0}
         working-directory: RPGMotor/
-        run: |
-          gcc -std=c99 -Wall -O2 \
-          ./app/main.c ./app/game_loop.c \
-          ./engine/core.c \
-          ./engine/input/input.c \
-          ./engine/graphics/graphics.c \
-          ./engine/graphics/draw.c \
-          ./engine/fonts/fonts.c \
-          ./test/test.c \
-          -I./engine -I./engine/input -I./engine/graphics -I./engine/fonts -I./test \
-          -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf \
-          -o ./app/rpg.exe
+        run: make
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: rpg-windows
-          path: RPGMotor/app/rpg.exe
+          path: RPGMotor/build/rpg.exe
